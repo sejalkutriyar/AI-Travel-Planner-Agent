@@ -50,10 +50,16 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(0, 200, 83, 0.6) !important;
     }
 
-    /* Input Fields Border Glow defined by primaryColor in config, 
-       just making input fields a bit nicer */
-    input, div[data-baseweb="select"] {
+    /* Input Fields Styling to make them look like distinct, empty boxes */
+    div[data-baseweb="input"] > div, div[data-baseweb="select"] > div {
+        background-color: #0F172A !important; /* Darker background to contrast with the form */
+        border: 1px solid #475569 !important; /* Visible outline box */
         border-radius: 8px !important;
+    }
+    
+    div[data-baseweb="input"] > div:focus-within, div[data-baseweb="select"] > div:focus-within {
+        border: 1px solid #00C853 !important; /* Green glow when typing */
+        box-shadow: 0 0 0 1px #00C853 !important;
     }
 </style>
 """, unsafe_allow_html=True)
