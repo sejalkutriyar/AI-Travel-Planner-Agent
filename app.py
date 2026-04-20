@@ -13,12 +13,20 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 
 def is_valid_destination(place_name):
-    """Uses Groq LLM to quickly verify if the input is a real location."""
+    """Uses Groq LLM to strictly verify if the input is a real location."""
     try:
         llm = ChatGroq(model="llama3-8b-8192", temperature=0)
-        prompt = f"Is '{place_name}' a real geographical location, city, or travel destination in the world? Reply ONLY with 'YES' or 'NO'."
+        prompt = f"""You are a strict geography validator. 
+User entered: '{place_name}'
+Is this a real, existing geographical location, city, country, or well-known travel destination?
+Ignore letter spam like 'abc', 'xyz', 'asdf', or imaginary places.
+Reply EXACTLY with the word 'YES' or 'NO' and nothing else."""
+        
         response = llm.invoke([HumanMessage(content=prompt)])
-        return "YES" in response.content.upper()
+        answer = response.content.strip().upper()
+        
+        # Strictly check for exact 'YES' or starting with 'YES' to avoid false positives
+        return answer == "YES" or answer.startswith("YES")
     except Exception:
         # If API fails for some reason during check, fallback to True to not block the user
         return True
