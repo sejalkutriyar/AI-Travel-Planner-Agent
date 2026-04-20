@@ -9,6 +9,20 @@ load_dotenv()
 
 st.set_page_config(page_title="AI Travel Planner", page_icon="🌍", layout="centered")
 
+from langchain_groq import ChatGroq
+from langchain_core.messages import HumanMessage
+
+def is_valid_destination(place_name):
+    """Uses Groq LLM to quickly verify if the input is a real location."""
+    try:
+        llm = ChatGroq(model="llama3-8b-8192", temperature=0)
+        prompt = f"Is '{place_name}' a real geographical location, city, or travel destination in the world? Reply ONLY with 'YES' or 'NO'."
+        response = llm.invoke([HumanMessage(content=prompt)])
+        return "YES" in response.content.upper()
+    except Exception:
+        # If API fails for some reason during check, fallback to True to not block the user
+        return True
+
 # --- CUSTOM CSS FOR PREMIUM LOOK ---
 st.markdown("""
 <style>
@@ -76,29 +90,38 @@ with st.form("travel_form"):
     submitted = st.form_submit_button("Plan My Trip! 🚀")
 
 if submitted:
-    if not destination:
+    if not destination.strip():
         st.error("Please enter a destination!")
     else:
-        with st.spinner(f"Agents are planning your {duration}-day trip to {destination}..."):
-            try:
-                # Prepare initial state
-                initial_state: TravelState = {
-                    "destination": destination,
-                    "duration": str(duration),
-                    "budget": budget,
-                    "research_output": "",
-                    "itinerary_output": "",
-                    "budget_output": "",
-                    "final_output": ""
-                }
+        # Step 1: Validate location
+        is_valid = False
+        with st.spinner(f"Verifying location '{destination}' exists..."):
+            is_valid = is_valid_destination(destination)
+            
+        if not is_valid:
+            st.error(f"❌ '{destination}' does not appear to be a valid real-world location. Please enter a valid city, country, or tourist destination.")
+        else:
+            # Step 2: Generate itinerary
+            with st.spinner(f"Agents are planning your {duration}-day trip to {destination}..."):
+                try:
+                    # Prepare initial state
+                    initial_state: TravelState = {
+                        "destination": destination,
+                        "duration": str(duration),
+                        "budget": budget,
+                        "research_output": "",
+                        "itinerary_output": "",
+                        "budget_output": "",
+                        "final_output": ""
+                    }
 
-                # Run the graph
-                app = build_graph()
-                result = app.invoke(initial_state)
+                    # Run the graph
+                    app = build_graph()
+                    result = app.invoke(initial_state)
 
-                # Show Final Result
-                st.success("🎉 Your travel plan is ready!")
-                st.markdown(result["final_output"])
-                
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
+                    # Show Final Result
+                    st.success("🎉 Your travel plan is ready!")
+                    st.markdown(result["final_output"])
+                    
+                except Exception as e:
+                    st.error(f"An error occurred while building the plan: {e}")
