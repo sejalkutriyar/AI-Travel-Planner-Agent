@@ -14,16 +14,6 @@ st.markdown("""
 <style>
     /* Main Background & Font applied by config.toml, this adds extra polish */
     
-    /* Gradient Title */
-    h1 {
-        background: -webkit-linear-gradient(45deg, #00C853, #69F0AE);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800;
-        text-align: center;
-        padding-bottom: 20px;
-    }
-    
     /* Center the subtitle */
     .st-emotion-cache-1y4p8pa, .st-emotion-cache-16idsys p {
         text-align: center;
