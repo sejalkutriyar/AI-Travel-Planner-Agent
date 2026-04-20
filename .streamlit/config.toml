@@ -1,0 +1,15 @@
+[theme]
+# Primary color (fixes the red input line and changes button color to green)
+primaryColor = "#00C853"
+
+# Background color for the main content area
+backgroundColor = "#0F172A"
+
+# Background color used for the sidebar and most interactive widgets
+secondaryBackgroundColor = "#1E293B"
+
+# Color used for almost all text
+textColor = "#F8FAFC"
+
+# Font family for all text in the app, except code blocks
+font = "sans serif"
